@@ -54,4 +54,28 @@ router.post("/", verifyJWT, (req, res) => {
   res.status(201).json(newTodo);
 });
 
+// PATCH /todos/:id - toggle done status
+router.patch("/:id", verifyJWT, (req, res) => {
+  const todoId = Number(req.params.id);
+  const todosData = readTodosFile();
+
+  if (!todosData[req.user]) {
+    return res.status(404).json({ message: "No todos found for user" });
+  }
+
+  const userTodos = todosData[req.user];
+  const todo = userTodos.find((t) => t.id === todoId);
+
+  if (!todo) {
+    return res.status(404).json({ message: "Todo not found" });
+  }
+
+  // Toggle done status
+  todo.done = !todo.done;
+
+  writeTodosFile(todosData);
+
+  res.json(todo);
+});
+
 module.exports = router;

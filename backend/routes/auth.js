@@ -1,8 +1,9 @@
 const express = require("express");
 const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
+const jwt = require("jsonwebtoken");
+const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
@@ -72,7 +73,7 @@ router.post("/login", async (req, res) => {
   res.cookie("jwt", accessToken, {
     httpOnly: true,
     secure: false,
-    sameSite: "strict",
+    sameSite: "lax",
     maxAge: 60 * 60 * 1000, // 1 hour
   });
 
@@ -80,19 +81,8 @@ router.post("/login", async (req, res) => {
 });
 
 // GET /auth/me
-router.get("/me", (req, res) => {
-  const token = req.cookies?.jwt; // read cookie
-  if (!token) {
-    return res.status(401).json({ message: "Not authenticated" });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
-    // just return the username (or more user info if needed)
-    res.json({ username: decoded.username });
-  } catch (err) {
-    return res.status(401).json({ message: "Invalid or expired token" });
-  }
+router.get("/me", verifyJWT, (req, res) => {
+  res.json({ username: req.user });
 });
 
 // POST /auth/logout
@@ -100,7 +90,7 @@ router.post("/logout", (req, res) => {
   res.clearCookie("jwt", {
     httpOnly: true,
     secure: false, // set true in production with HTTPS
-    sameSite: "strict",
+    sameSite: "lax",
   });
   res.json({ message: "Logged out successfully" });
 });

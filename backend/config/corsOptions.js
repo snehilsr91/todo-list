@@ -1,7 +1,6 @@
 const allowedOrigins = [
   "http://localhost:3000", // React dev
-  "http://localhost:5000",
-  // Add other allowed origins here (e.g., production domain)
+  "http://localhost:5000", // Backend
 ];
 
 const corsOptions = {
