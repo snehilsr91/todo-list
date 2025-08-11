@@ -55,6 +55,11 @@ function Todos({ accessToken }) {
     <>
       <button onClick={fetchTodos}>Fetch Todos</button>
 
+      <ul>
+        {todos.map((todo) => (
+          <Item key={todo.id} todo={todo} />
+        ))}
+      </ul>
       <form onSubmit={addTodo} style={{ marginTop: "1rem" }}>
         <input
           type="text"
@@ -64,12 +69,6 @@ function Todos({ accessToken }) {
         />
         <button type="submit">Add</button>
       </form>
-
-      <ul>
-        {todos.map((todo) => (
-          <Item key={todo.id} todo={todo} />
-        ))}
-      </ul>
     </>
   );
 }

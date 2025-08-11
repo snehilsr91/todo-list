@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import Form from "./components/Form";
+import { useState } from "react";
+import AuthForm from "./components/AuthForm";
 import Todos from "./components/Todos";
 
 function App() {
@@ -8,8 +8,8 @@ function App() {
   if (!accessToken) {
     return (
       <div style={{ padding: "2rem" }}>
-        <h2>Login</h2>
-        <Form setAccessToken={setAccessToken} />
+        <h2>Login/Register</h2>
+        <AuthForm setAccessToken={setAccessToken} />
       </div>
     );
   }

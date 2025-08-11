@@ -5,6 +5,7 @@ const fs = require("fs");
 const path = require("path");
 
 const router = express.Router();
+
 const usersFilePath = path.join(__dirname, "..", "data", "users.json");
 
 // Helper: read users.json
@@ -24,6 +25,7 @@ function writeUsersFile(data) {
 // POST /auth/register
 router.post("/register", async (req, res) => {
   const { username, password } = req.body;
+
   if (!username || !password) {
     return res
       .status(400)
@@ -37,6 +39,7 @@ router.post("/register", async (req, res) => {
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
+
   users.push({ username, password: hashedPassword });
   writeUsersFile(users);
 
@@ -46,9 +49,10 @@ router.post("/register", async (req, res) => {
 // POST /auth/login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  const users = readUsersFile();
 
+  const users = readUsersFile();
   const user = users.find((u) => u.username === username);
+
   if (!user) {
     return res.status(401).json({ message: "Invalid username or password" });
   }
