@@ -1,0 +1,19 @@
+{
+  "testuser": [
+    {
+      "id": 1,
+      "task": "Learn Node.js",
+      "done": false
+    },
+    {
+      "id": 2,
+      "task": "Build Todo App",
+      "done": false
+    },
+    {
+      "id": 1754906146491,
+      "task": "Learn ORMs",
+      "done": false
+    }
+  ]
+}

@@ -1,18 +1,57 @@
 const express = require("express");
+const fs = require("fs");
+const path = require("path");
 const verifyJWT = require("../middleware/verifyJWT");
 
 const router = express.Router();
 
-const todos = {
-  testuser: [
-    { id: 1, task: "Learn Node.js", done: false },
-    { id: 2, task: "Build Todo App", done: false },
-  ],
-};
+const todosFilePath = path.join(__dirname, "..", "data", "todos.json");
+
+// Helper: read todos.json
+function readTodosFile() {
+  if (!fs.existsSync(todosFilePath)) {
+    fs.writeFileSync(todosFilePath, JSON.stringify({}, null, 2));
+  }
+  const data = fs.readFileSync(todosFilePath, "utf-8");
+  return JSON.parse(data);
+}
+
+// Helper: write to todos.json
+function writeTodosFile(data) {
+  fs.writeFileSync(todosFilePath, JSON.stringify(data, null, 2));
+}
 
 // GET /todos
 router.get("/", verifyJWT, (req, res) => {
-  res.json(todos[req.user] || []);
+  const todosData = readTodosFile();
+  const userTodos = todosData[req.user] || [];
+  res.json(userTodos);
+});
+
+// POST /todos
+router.post("/", verifyJWT, (req, res) => {
+  const { task } = req.body;
+
+  if (!task) {
+    return res.status(400).json({ message: "Task is required" });
+  }
+
+  const todosData = readTodosFile();
+
+  if (!todosData[req.user]) {
+    todosData[req.user] = [];
+  }
+
+  const newTodo = {
+    id: Date.now(),
+    task,
+    done: false,
+  };
+
+  todosData[req.user].push(newTodo);
+  writeTodosFile(todosData);
+
+  res.status(201).json(newTodo);
 });
 
 module.exports = router;
