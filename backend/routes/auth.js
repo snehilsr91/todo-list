@@ -68,7 +68,41 @@ router.post("/login", async (req, res) => {
     { expiresIn: "1h" }
   );
 
-  res.json({ accessToken });
+  // Set the JWT in a cookie
+  res.cookie("jwt", accessToken, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "strict",
+    maxAge: 60 * 60 * 1000, // 1 hour
+  });
+
+  res.json({ message: "Login successful" });
+});
+
+// GET /auth/me
+router.get("/me", (req, res) => {
+  const token = req.cookies?.jwt; // read cookie
+  if (!token) {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+
+  try {
+    const decoded = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET);
+    // just return the username (or more user info if needed)
+    res.json({ username: decoded.username });
+  } catch (err) {
+    return res.status(401).json({ message: "Invalid or expired token" });
+  }
+});
+
+// POST /auth/logout
+router.post("/logout", (req, res) => {
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: false, // set true in production with HTTPS
+    sameSite: "strict",
+  });
+  res.json({ message: "Logged out successfully" });
 });
 
 module.exports = router;

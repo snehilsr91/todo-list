@@ -1,16 +1,14 @@
 import { useState } from "react";
 import Item from "./Item";
 
-function Todos({ accessToken }) {
+function Todos() {
   const [todos, setTodos] = useState([]);
   const [newTask, setNewTask] = useState("");
 
   const fetchTodos = async () => {
     try {
       const res = await fetch("http://localhost:5000/todos", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
+        credentials: "include",
       });
 
       if (!res.ok) {
@@ -32,9 +30,9 @@ function Todos({ accessToken }) {
     try {
       const res = await fetch("http://localhost:5000/todos", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
         },
         body: JSON.stringify({ task: newTask }),
       });
@@ -44,8 +42,8 @@ function Todos({ accessToken }) {
         throw new Error(errorData.message || "Failed to add todo");
       }
 
-      setNewTask(""); // clear input
-      fetchTodos(); // refresh list
+      setNewTask("");
+      fetchTodos();
     } catch (err) {
       console.error(err.message);
     }
@@ -60,6 +58,7 @@ function Todos({ accessToken }) {
           <Item key={todo.id} todo={todo} />
         ))}
       </ul>
+
       <form onSubmit={addTodo} style={{ marginTop: "1rem" }}>
         <input
           type="text"

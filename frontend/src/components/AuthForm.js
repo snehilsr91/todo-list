@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-function AuthForm({ setAccessToken }) {
+function AuthForm({ onLogin }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isRegister, setIsRegister] = useState(false);
@@ -17,6 +17,7 @@ function AuthForm({ setAccessToken }) {
 
       const res = await fetch(endpoint, {
         method: "POST",
+        credentials: "include", // important for cookies
         headers: {
           "Content-Type": "application/json",
         },
@@ -35,7 +36,8 @@ function AuthForm({ setAccessToken }) {
         setUsername("");
         setPassword("");
       } else {
-        setAccessToken(data.accessToken);
+        // no access token needed — just mark user as logged in
+        onLogin();
       }
     } catch (err) {
       setMessage(`❌ ${err.message}`);
